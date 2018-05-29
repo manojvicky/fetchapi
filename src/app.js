@@ -6,25 +6,46 @@ class App extends React.Component {
         data: []
     };
     this.handleclick= this.handleclick.bind(this);
+    this.handleclickok= this.handleclickok.bind(this);
+    this.getJSON= this.getJSON.bind(this);
+    // this.getChapter= this.getChapter.bind(this);
 }
     
+getJSON(url) {
+  return this.handleclick(url)
+      .then(response => response.json()
+          .then(data => {this.props.actions.datadispatch(data); data;}));
+}
+handleclick(url) {
+  return new Promise((resolve, reject) => {
+      fetch(url).then(response => {
+          if (response.status === 200) {
+              resolve(response);
+          } else {
+              reject(Error(response.statusText))
+          }
+      })
+  })
+}
 
-handleclick(){
-  let url="some.json";
-  return new Promise((resolve, reject)=>{
-  fetch(url).then(response=>{
-    if(response.status===200){
-      resolve(response);
-    }else{
-      reject(Error(response.statusText))
-    }
+getChapter(i){
+  storyPromise = this.getJSON('story.json');
+
+  return storyPromise.then(function(story) {
+    return this.getJSON(story.chapterUrls[i]);
   })
-  }).then(data=>data.json())
-  .then(data=>{
-    console.log(data);
-    this.props.actions.datadispatch(data);
-  })
-  }
+}
+
+handleclickok(){
+  // this.getChapter(0).then(function(chapter) {
+  //   console.log(chapter);
+  //   return getChapter(1);
+  // }).then(function(chapter) {
+  //   console.log(chapter);
+  // })
+  this.getJSON("some.json");
+}
+
 
    render() {
      
@@ -35,7 +56,7 @@ handleclick(){
       return (
         <div>
         <div>Hello world</div>
-        <button onClick={this.handleclick}>click me</button>
+        <button onClick={this.handleclickok}>click me</button>
         {data}
         </div>
       );
